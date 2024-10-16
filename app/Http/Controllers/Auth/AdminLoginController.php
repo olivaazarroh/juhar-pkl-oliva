@@ -33,6 +33,12 @@ class AdminLoginController extends Controller
         }
 
         return back()->withErrors(['login_error' => 'Username atau Password Salah.'])->onlyInput('username');
+
+    }
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/admin/login');
     }
 
     /**

@@ -21,10 +21,10 @@ class AdminSeeder extends Seeder
                     'foto'=> null,
                 ],
                 [
-                'username' => 'admin2',
-                'password' => bcrypt('password123'),
-                'nama_admin' => 'Administrator 1',
-                'foto'=> null,
+                    'username' => 'admin2',
+                    'password' => bcrypt('password123'),
+                    'nama_admin' => 'Administrator 1',
+                    'foto'=> null,
                 ]
             ];
 
