@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class SiswaController extends Controller
 {
@@ -60,6 +61,23 @@ class SiswaController extends Controller
         return redirect()->route('admin.pembimbing.siswa', $id)->with('success', 'Data siswa Berhasil Di Tambah.');
     }
 
+    public function delete($id, $id_siswa)
+    {
+    $siswa = Siswa::find($id_siswa);
+
+    if ($siswa->foto) {
+        $foto = $siswa->foto;
+
+        if (Storage::disk('public')->exists($foto)) {
+            Storage::disk('public')->delete($foto);
+        }
+
+    }
+    $siswa->delete();
+
+    return redirect()->route('admin.pembimbing.siswa', $id)->with('success', 'Data Siswa Berhasil Di Hapus');
+    }
+
     /**
      * Display the specified resource.
      */
@@ -71,17 +89,44 @@ class SiswaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id, $id_siswa)
     {
-        //
+        $siswa = Siswa::find($id_siswa);
+        return view('admin.edit_siswa', compact('siswa', 'id'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id, $id_siswa)
     {
-        //
+        $siswa = Siswa::find($id_siswa);
+
+        $request->validate([
+            'nisn' => 'required|digits:10|unique:siswa,nisn,' . $siswa->id_siswa . ',id_siswa',
+            'nama_siswa' => 'required|',
+            'password' => 'required|min:6',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $foto = $siswa->foto;
+        if ($request->hasFile('foto')) {
+            if ($foto) {
+                Storage::disk('public')->delete($foto);
+            }
+            $uniqueFile = uniqid() . '_' . $request->file('foto')->getClientOriginalName();
+            $request->file('foto')->storeAs('foto_guru', $uniqueFile, 'public');
+            $foto = 'foto_siswa/' . $uniqueFile;
+        }
+
+        $siswa->update([
+            'nisn' => $request->nisn,
+            'nama_siswa' => $request->nama_siswa,
+            'password' => $request->filled('password') ? Hash::make($request->password) : $siswa->password,
+            'foto' => $foto,
+        ]);
+        
+        return redirect()->route('admin.pembimbing.siswa', $id)->with('success', 'Data siswa Berhasil Di Update.');
     }
 
     /**
