@@ -7,6 +7,7 @@ use App\Models\Admin\Dudi;
 use App\Models\Admin\Guru;
 use App\Models\Admin\Pembimbing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PembimbingController extends Controller
 {
@@ -91,6 +92,13 @@ class PembimbingController extends Controller
         ]);
         
         return redirect()->route('admin.pembimbing')->with('success', 'Data pembimbing Berhasil Di Update.');
+    }
+
+    public function pembimbingGuru()
+    {
+        $guru = Auth::guard('guru')->user();
+        $pembimbings = pembimbing::where('id_guru', $guru->id_guru)->get();
+        return view('guru.pembimbing', compact('pembimbings'));
     }
 }
 
