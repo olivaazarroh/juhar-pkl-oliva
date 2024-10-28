@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\kegiatan;
 use App\Models\Admin\Pembimbing;
 use App\Models\Admin\Siswa;
 use Illuminate\Http\Request;
@@ -151,5 +152,60 @@ class SiswaController extends Controller
         $siswas = Siswa::where('id_pembimbing', $id)->get();
         $siswa = Siswa::where('id_pembimbing', $id)->first();
         return view('guru.siswa', compact('siswas', 'siswa', 'id'));
+    }
+
+    public function dashboard()
+    {
+        return view('siswa.dashboard');
+    }
+
+    public function logout(Request $request) 
+    {
+        Auth::guard('siswa')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('siswa.login');
+    }
+
+    public function kegiatan()
+    {
+        $siswa = Auth::guard('siswa')->user();
+        $kegiatans = kegiatan::where('id_siswa', $siswa->id_siswa)->get();
+        return view('siswa.kegiatan', compact('kegiatans'));
+    }
+
+    public function createkegiatan($id)
+    {
+        return view('kegiatan.tambah_kegiatan');
+    }
+
+    public function storekegiatan(Request $request)
+    {
+        $request->validate([
+            'tanggal_kegiatan' => 'required',
+            'nama_kegiatan' => 'required',
+            'ringkasan_kegiatan' => 'required',
+            'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $foto = null;
+
+        if ($request->hasFile('foto')) {
+            $uniqueFile = uniqid() . '_' . $request->file('foto')->getClientOriginalName();
+
+            $request->file('foto')->storeAs('foto_kegiatan', $uniqueFile, 'public');
+
+            $foto = 'foto_kegiatan/' . $uniqueFile;
+        }
+
+        Siswa::create([
+            'id_siswa' => $request->id_siswa,
+            'tanggal_kegiatan' => $request->tanggal_kegiatan,
+            'nama_kegiatan' => $request->nama_kegiatan,
+            'ringkasan_kegiatan' => $request->ringkasan_kegiatan,
+            'foto' => $foto,
+        ]);
+
+        return redirect()->route('siswa.kegiatan')->with('success', 'Data siswa Berhasil Di Tambah.');
     }
 }
