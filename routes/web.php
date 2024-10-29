@@ -77,13 +77,22 @@ Route::middleware(['guru'])->group(function (){
     Route::get('/guru/pembimbing/{id}/siswa/{id_siswa}', [GuruController::class, 'kegiatan'])->name('guru.pembimbing.siswa.kegiatan');
     Route::get('/guru/pembimbing/{id}/siswa/{id_siswa}/kegiatan', [KegiatanController::class, 'kegiatan'])->name('guru.pembimbing.siswa.kegiatan');
     Route::get('/guru/pembimbing/{id}/siswa/{id_siswa}/kegiatan/detail/{id_kegiatan}', [KegiatanController::class, 'detailKegiatan'])->name('guru.pembimbing.siswa.kegiatan.detail');
+
+    Route::get('/guru/pembimbing/{id}/siswa/{id_siswa}/kegiatan/cari', [KegiatanController::class, 'Carikegiatan'])->name('guru.pembimbing.siswa.kegiatan.cari');
 });
 
 Route::middleware(['siswa'])->group(function () {
     Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
     Route::get('/siswa/kegiatan', [SiswaController::class, 'kegiatan'])->name('siswa.kegiatan');
     Route::get('/siswa/logout', [SiswaController::class, 'logout'])->name('siswa.logout');
+    Route::get('/siswa/profile', [SiswaController::class, 'profile'])->name('siswa.profile');
+    Route::put('/siswa/profile/update', [SiswaController::class, 'updateSiswa'])->name('siswa.profile.update');
 
-    Route::get('/siswa/kegiatan/tambah', [SiswaController::class, 'create'])->name('kegiatan.create');
-    Route::post('/siswa/kegiatan/tambah', [SiswaController::class, 'store'])->name('kegiatan.store');
+    Route::get('/siswa/kegiatan/tambah', [SiswaController::class, 'createkegiatan'])->name('kegiatan.create');
+    Route::post('/siswa/kegiatan/tambah', [SiswaController::class, 'storekegiatan'])->name('kegiatan.store');
+    Route::get('/siswa/kegiatan/edit/{id_kegiatan}', [SiswaController::class, 'editKegiatan'])->name('siswa.kegiatan.edit');
+    Route::put('/siswa/kegiatan/edit/{id_kegiatan}', [SiswaController::class, 'updateKegiatan'])->name('siswa.kegiatan.update');
+    Route::get('/siswa/kegiatan/delete/{id_kegiatan}', [SiswaController::class, 'deleteKegiatan'])->name('siswa.kegiatan.delete');
+    Route::get('/siswa/kegiatan/kegiatan/{id_kegiatan}', [SiswaController::class, 'detailKegiatan'])->name('siswa.kegiatan.detail');
+    Route::get('/siswa/kegiatan/detail/{id_kegiatan}', [SiswaController::class, 'detailKegiatan'])->name('siswa.kegiatan.detail');
 });
